@@ -32,6 +32,7 @@ def parse_args(argv = None):
     parser.add_argument('-v', '--verbose', action="store_const", dest="log", const=logging.INFO, help="loglevel info")
     parser.add_argument('-V', '--version', action='version', version=f'%(prog)s {__VERSION__}')
     parser.add_argument('--listen', action='store', default=f"{ip_address}:8080", help=f"IP address and port for roku api, in the form of {ip_address}:8080")
+    parser.add_argument('--advertise', action='store', default=f"{ip_address}:8080", help=f"IP address and port for roku advertise, in the form of {ip_address}:8080")
     parser.add_argument('--usn', action='store', default="roku2mqtt", help="Roku usn")
     return parser.parse_args(argv)
 
@@ -59,6 +60,7 @@ def main():
     setup_logging(args.logfile, args.log)
 
     ip_address, separator, port = args.listen.rpartition(':')
+    ip_advertise, separator, port_advertise = args.advertise.rpartition(':')
     assert separator
 
     def signal_handler(_sig, _frame):
@@ -75,7 +77,9 @@ def main():
             ),
             roku_usn = args.usn,
             host_ip = ip_address,
-            listen_port = int(port)
+            listen_port = int(port),
+            advertise_ip = ip_advertise,
+            advertise_port = int(port_advertise)
         )
         await roku_api.start()
 
